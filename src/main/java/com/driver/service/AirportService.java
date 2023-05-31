@@ -67,6 +67,9 @@ public class AirportService {
             if(p == passengerId) return "FAILURE";
         }
         airportRepository.bookTheTickets(flightId,passengerId);
+        int curRevenue = flight.get().getRevenue();
+        int ticketPrice = getFlightTicketPrice(flightId);
+        flight.get().setRevenue(curRevenue + ticketPrice);
         return  "Success";
     }
 
@@ -77,6 +80,9 @@ public class AirportService {
         for(int p : passengerList){
             if(p == passengerId){
                 airportRepository.cancelTheTickets(flightId,passengerId);
+                int curRevenue = flight.get().getRevenue();
+                int ticketPrice = getFlightTicketPrice(flightId);
+                flight.get().setRevenue(curRevenue - ticketPrice);
                 return "SUCCESS";
             }
         }
@@ -90,10 +96,13 @@ public class AirportService {
     }
 
     public int getRevenue(Integer flightId) {
-        List<Integer> passengerList = airportRepository.getPassengerListForThisFlight(flightId);
-        int size = passengerList.size();
-        int sum = (size * (size + 1))/2;
-        return (size * 3000) + (sum * 50);
+//        List<Integer> passengerList = airportRepository.getPassengerListForThisFlight(flightId);
+//        int size = passengerList.size();
+//        int sum = (size * (size + 1))/2;
+//        return (size * 3000) + (sum * 50);
+        Optional<Flight> flight = airportRepository.getFlight(flightId);
+        if(flight.isPresent()) return flight.get().getRevenue();
+        else return 0;
     }
 
     public int getBookingsFromPassengers(Integer passengerId) {
